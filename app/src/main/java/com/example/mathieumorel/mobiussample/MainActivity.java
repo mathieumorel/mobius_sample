@@ -13,14 +13,15 @@ import com.spotify.mobius.functions.Consumer;
 
 import java.util.Locale;
 
-import static com.example.mathieumorel.mobiussample.Effect.REPORT_ERROR_NEGATIVE;
+import static com.example.mathieumorel.mobiussample.Event.down;
+import static com.example.mathieumorel.mobiussample.Event.up;
 import static com.spotify.mobius.Effects.effects;
 import static com.spotify.mobius.Next.dispatch;
 import static com.spotify.mobius.Next.next;
 
 public class MainActivity extends AppCompatActivity {
 
-    private MobiusLoop<Integer, Event, ?> mMobiusLoop;
+    private MobiusLoop<Model, Event, Effect> mMobiusLoop;
     private TextView mCounterTextView;
 
     @Override
@@ -34,10 +35,10 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         mMobiusLoop = Mobius.loop(MainActivity::update, MainActivity::effectHandler)
-                .startFrom(2);
+                .startFrom(Model.create(2));
 
-        findViewById(R.id.up_btn).setOnClickListener(view -> mMobiusLoop.dispatchEvent(Event.UP));
-        findViewById(R.id.down_btn).setOnClickListener(view -> mMobiusLoop.dispatchEvent(Event.DOWN));
+        findViewById(R.id.up_btn).setOnClickListener(view -> mMobiusLoop.dispatchEvent(up()));
+        findViewById(R.id.down_btn).setOnClickListener(view -> mMobiusLoop.dispatchEvent(down()));
 
         mMobiusLoop.observe(counter -> {
             System.out.println("The counter value is " + counter);
@@ -51,28 +52,27 @@ public class MainActivity extends AppCompatActivity {
         mMobiusLoop.dispose();
     }
 
-    static Next<Integer, Effect> update(int model, Event event) {
-        switch (event) {
-            case UP:
-                return next(model + 1);
+    static Next<Model, Effect> update(Model model, Event event) {
+        return event.map(
+                up -> next(model.increase()),
 
-            case DOWN:
-                if (model > 0) {
-                    return next(model - 1);
+                down -> {
+                    if (model.counter() > 0) {
+                        return next(model.decrease());
+                    }
+                    return dispatch(effects(Effect.reportErrorNegative()));
                 }
-                return dispatch(effects(Effect.REPORT_ERROR_NEGATIVE));
-        }
-        // this should not be required here
-        return Next.next(0);
+        );
     }
 
     static Connection<Effect> effectHandler(Consumer<Event> eventConsumer) {
         return new Connection<Effect>() {
             @Override
             public void accept(Effect effect) {
-                if (effect == REPORT_ERROR_NEGATIVE) {
-                    System.out.println("The counter is error!");
-                }
+                // effect.match() is like event.map() but has no return value
+                effect.match(
+                        reportErrorNegative -> System.out.println("error!")
+                );
             }
 
             @Override
