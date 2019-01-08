@@ -1,6 +1,7 @@
 package com.example.mathieumorel.mobiussample;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
@@ -10,8 +11,6 @@ import com.spotify.mobius.Mobius;
 import com.spotify.mobius.MobiusLoop;
 import com.spotify.mobius.Next;
 import com.spotify.mobius.functions.Consumer;
-
-import java.util.Locale;
 
 import static com.example.mathieumorel.mobiussample.Event.down;
 import static com.example.mathieumorel.mobiussample.Event.up;
@@ -37,13 +36,17 @@ public class MainActivity extends AppCompatActivity {
         mMobiusLoop = Mobius.loop(MainActivity::update, MainActivity::effectHandler)
                 .startFrom(Model.create(2));
 
-        findViewById(R.id.up_btn).setOnClickListener(view -> mMobiusLoop.dispatchEvent(up()));
-        findViewById(R.id.down_btn).setOnClickListener(view -> mMobiusLoop.dispatchEvent(down()));
+        mMobiusLoop.observe(counter -> System.out.println("Counter " + counter.counter()));
 
-        mMobiusLoop.observe(counter -> {
-            System.out.println("The counter value is " + counter);
-            mCounterTextView.setText(String.format(Locale.getDefault(), "The counter is %d", counter));
-        });
+        mMobiusLoop.dispatchEvent(down());    // prints "1"
+        mMobiusLoop.dispatchEvent(down());    // prints "0"
+        mMobiusLoop.dispatchEvent(down());    // prints "error!"
+        mMobiusLoop.dispatchEvent(up());      // prints "1"
+        mMobiusLoop.dispatchEvent(up());      // prints "2"
+        mMobiusLoop.dispatchEvent(down());    // prints "1"
+
+        //findViewById(R.id.up_btn).setOnClickListener(view -> mMobiusLoop.dispatchEvent(up()));
+        //findViewById(R.id.down_btn).setOnClickListener(view -> mMobiusLoop.dispatchEvent(down()));
     }
 
     @Override
@@ -52,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         mMobiusLoop.dispose();
     }
 
+    @NonNull
     static Next<Model, Effect> update(Model model, Event event) {
         return event.map(
                 up -> next(model.increase()),
@@ -71,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
             public void accept(Effect effect) {
                 // effect.match() is like event.map() but has no return value
                 effect.match(
-                        reportErrorNegative -> System.out.println("error!")
+                        reportErrorNegative -> System.out.println("Counter error!")
                 );
             }
 
