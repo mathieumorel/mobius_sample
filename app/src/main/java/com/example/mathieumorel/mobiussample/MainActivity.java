@@ -15,6 +15,7 @@ import java.util.Locale;
 
 import static com.example.mathieumorel.mobiussample.Effect.REPORT_ERROR_NEGATIVE;
 import static com.spotify.mobius.Effects.effects;
+import static com.spotify.mobius.Next.dispatch;
 import static com.spotify.mobius.Next.next;
 
 public class MainActivity extends AppCompatActivity {
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
                 if (model > 0) {
                     return next(model - 1);
                 }
-                return next(model, effects(Effect.REPORT_ERROR_NEGATIVE));
+                return dispatch(effects(Effect.REPORT_ERROR_NEGATIVE));
         }
         // this should not be required here
         return Next.next(0);
