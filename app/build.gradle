@@ -32,6 +32,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
     implementation 'com.spotify.mobius:mobius-core:1.2.0'
+    implementation 'com.spotify.mobius:mobius-rx2:1.2.0'
     implementation 'com.spotify.mobius:mobius-extras:1.2.0'   // utilities for common patterns
 
     implementation "com.google.auto.value:auto-value-annotations:1.6.2"
