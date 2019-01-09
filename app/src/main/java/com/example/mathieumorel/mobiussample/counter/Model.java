@@ -1,4 +1,4 @@
-package com.example.mathieumorel.mobiussample;
+package com.example.mathieumorel.mobiussample.counter;
 
 import com.google.auto.value.AutoValue;
 

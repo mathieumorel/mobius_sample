@@ -3,17 +3,19 @@ package com.example.mathieumorel.mobiussample;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 
+import com.example.mathieumorel.mobiussample.counter.Effect;
+import com.example.mathieumorel.mobiussample.counter.Event;
+import com.example.mathieumorel.mobiussample.counter.Model;
 import com.spotify.mobius.Connection;
 import com.spotify.mobius.Mobius;
 import com.spotify.mobius.MobiusLoop;
 import com.spotify.mobius.Next;
 import com.spotify.mobius.functions.Consumer;
 
-import static com.example.mathieumorel.mobiussample.Event.down;
-import static com.example.mathieumorel.mobiussample.Event.up;
+import static com.example.mathieumorel.mobiussample.counter.Event.down;
+import static com.example.mathieumorel.mobiussample.counter.Event.up;
 import static com.spotify.mobius.Effects.effects;
 import static com.spotify.mobius.Next.dispatch;
 import static com.spotify.mobius.Next.next;
@@ -28,10 +30,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mCounterTextView = findViewById(R.id.counter_txt);
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        //mCounterTextView = findViewById(R.id.counter_txt);
 
         mMobiusLoop = Mobius.loop(MainActivity::update, MainActivity::effectHandler)
                 .startFrom(Model.create(2));
